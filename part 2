@@ -1,0 +1,56 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.metrics import r2_score
+import statsmodels.api as sm
+from sklearn.metrics import confusion_matrix
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import LabelEncoder
+from sklearn.cluster import AgglomerativeClustering
+
+veriler = pd.read_csv(r'C:\Users\selahattin\Desktop\ulke_boy.csv')
+
+X = veriler.iloc[:,2:3].values
+
+from sklearn.cluster import KMeans
+
+kmeans = KMeans ( n_clusters = 3, init = 'k-means++')
+kmeans.fit(X)
+
+print(kmeans.cluster_centers_)
+results = []
+for i in range(1,11):
+    kmeans = KMeans (n_clusters = i, init='k-means++', random_state= 123)
+    kmeans.fit(X)
+    results.append(kmeans.inertia_)
+
+plt.plot(range(1,11),results)
+plt.show()
+
+kmeans = KMeans (n_clusters = 4, init='k-means++', random_state= 123)
+Y_guess= kmeans.fit_predict(X)
+print(Y_guess)  
+plt.scatter(X[Y_guess==0,0],X[Y_guess==0,1],s=100, c='red')
+plt.scatter(X[Y_guess==1,0],X[Y_guess==1,1],s=100, c='blue')
+plt.scatter(X[Y_guess==2,0],X[Y_guess==2,1],s=100, c='green')
+plt.scatter(X[Y_guess==3,0],X[Y_guess==3,1],s=100, c='yellow')
+
+plt.title('KMeans')
+plt.show()
+
+#H
+
+ac = AgglomerativeClustering(n_clusters=4, affinity='euclidean', linkage='ward')
+Y_tahmin = ac.fit_predict(X)
+print(Y_tahmin)
+
+plt.scatter(X[Y_guess==0,0],X[Y_guess==0,1],s=100, c='purple')
+plt.scatter(X[Y_guess==1,0],X[Y_guess==1,1],s=100, c='blue')
+plt.scatter(X[Y_guess==2,0],X[Y_guess==2,1],s=100, c='black')
+plt.scatter(X[Y_guess==3,0],X[Y_guess==3,1],s=100, c='yellow')
+plt.title('HC')
+plt.show()
+
+import scipy.cluster.hierarchy as sch
+dendrogram = sch.dendrogram(sch.linkage(X, method='ward'))
+plt.show()
