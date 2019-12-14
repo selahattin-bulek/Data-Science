@@ -1,0 +1,221 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.metrics import r2_score
+import statsmodels.api as sm
+
+veriler=pd.read_csv(r'C:\Users\selahattin\Desktop\ulke_boy.csv')
+print(veriler)
+
+x = veriler.iloc[:, 1:2]
+y = veriler.iloc[:, 2:3]
+X = x.values
+Y = y.values
+
+print(veriler.corr())
+
+from sklearn.linear_model import LinearRegression
+
+Lr = LinearRegression()
+Lr.fit(X, Y)
+plt.scatter(X, Y, color='red')
+plt.plot(x, Lr.predict(X), color='purple')
+plt.show()
+
+# pvalues 
+##x is necessary we learn it 
+
+model = sm.OLS(Lr.predict(X), X)
+print(model.fit().summary())
+
+print("Linear R2 :")
+print(r2_score(Y, Lr.predict((X))))
+
+# x_train
+from sklearn.model_selection import train_test_split
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.33, random_state=0)
+
+# logistic
+
+##We trained x and y values
+from sklearn.linear_model import LogisticRegression
+
+Logr = LogisticRegression(random_state=0)
+Logr.fit(x_train, y_train)
+
+y_pred = Logr.predict(x_test)
+print(y_pred)
+print(y_test)
+##We estimated the value of x
+from sklearn.metrics import confusion_matrix
+
+cm = confusion_matrix(y_test,y_pred)
+print('logistic')
+print(cm)
+
+print('logistic R square')
+print(r2_score(Y, Logr.predict(X)))
+##we check the classification
+
+# StandardScaler
+
+from sklearn.preprocessing import StandardScaler
+
+sc = StandardScaler()
+X_train = sc.fit_transform(x_train)
+X_test = sc.fit_transform(x_test)
+Y_train = sc.fit_transform(y_train)
+Y_test = sc.fit_transform(y_test)
+##we built the model x_train,y_train
+Lr = LinearRegression()
+Lr.fit(x_train, y_train)
+pred = Lr.predict(x_test)
+##We estimated the value of x
+x_train = x_train.sort_index()
+y_train = y_train.sort_index()
+
+plt.scatter(x_train, y_train, color='red')
+plt.plot(x_test, Lr.predict(x_test), color='black')
+plt.show()
+
+##show x and y values and x test value is also estimated
+
+# knn
+
+from sklearn.neighbors import KNeighborsClassifier
+
+knn = KNeighborsClassifier(n_neighbors=1, metric='minkowski')
+knn.fit(X_train, y_train)
+
+pred = knn.predict(X_test)
+
+cm = confusion_matrix(y_test, pred)
+print(cm)
+
+# POLY
+from sklearn.preprocessing import PolynomialFeatures
+
+poly_reg = PolynomialFeatures(degree=2)
+x_poly = poly_reg.fit_transform(X)
+print(x_poly)
+
+lin_reg2 = LinearRegression()
+lin_reg2.fit(x_poly, y)
+##I showed neighboring values
+plt.scatter(X, Y, color='red')
+plt.plot(x, lin_reg2.predict(poly_reg.fit_transform(X)), color='Green')
+
+plt.show()
+
+#SVR SUPPORT VECTOR 
+from sklearn.preprocessing import StandardScaler
+
+sc1 = StandardScaler()
+x_olcekli = sc1.fit_transform(X)
+sc2 = StandardScaler()
+y_olcekli = sc2.fit_transform(Y)
+
+from sklearn.svm import SVR
+
+svr_reg = SVR(kernel='rbf')
+svr_reg.fit(x_olcekli, y_olcekli)
+
+plt.scatter(x_olcekli, y_olcekli, color='red')
+plt.plot(x_olcekli, svr_reg.predict(x_olcekli), color='blue')
+
+plt.show()
+print('svr R square')
+print(r2_score(Y, svr_reg.predict(X)))
+
+# SVC /SVM CLASSİFİER
+
+from sklearn.svm import SVC
+
+svc = SVC(kernel='poly')
+svc.fit(X_train, y_train)
+##support vector 
+y_pred = svc.predict(X_test)
+
+cm = confusion_matrix(y_test, y_pred)
+print('SVC')
+print(cm)
+
+# Decision Tree Regression
+from sklearn.tree import DecisionTreeRegressor
+
+r_dt = DecisionTreeRegressor(random_state=0)
+r_dt.fit(X, Y)
+
+plt.scatter(X, Y, color='black')
+plt.plot(X, r_dt.predict(X), color='blue')
+plt.show()
+##fit the x and y values ,I wanted him to guess X 
+print('Decision tree R square')
+print(r2_score(Y, r_dt.predict(X)))
+
+# Decision tree  
+##classification
+from sklearn.tree import DecisionTreeClassifier
+
+dtc = DecisionTreeClassifier(criterion='entropy')
+
+dtc.fit(X_train, y_train)
+y_pred = dtc.predict(X_test)
+
+cm = confusion_matrix(y_test, y_pred)
+print('DTC')
+print(cm)
+##graded and controlled by matrix
+
+#Random forest
+
+
+from sklearn.ensemble import RandomForestRegressor
+
+rf_reg = RandomForestRegressor(n_estimators=10, random_state=0)
+rf_reg.fit(X, Y)
+
+plt.scatter(X, Y, color='red')
+plt.plot(x, rf_reg.predict(X), color='yellow')
+
+# random forest classification
+from sklearn.ensemble import RandomForestClassifier
+
+rfc = RandomForestClassifier(n_estimators=10, criterion='entropy')
+rfc.fit(X_train, y_train)
+
+y_pred = rfc.predict(X_test)
+cm = confusion_matrix(y_test, y_pred)
+print('RFC')
+print(cm)
+
+##'R square random forest 
+
+from sklearn.metrics import r2_score
+
+print('random forest R square')
+print(r2_score(Y, rf_reg.predict(X)))
+
+from sklearn.svm import SVC
+
+svc = SVC(kernel='linear')
+svc.fit(x_train, y_train)
+kl = confusion_matrix(y_test, pred)
+print(SVC)
+print(kl, 'KL')
+
+# naive bayes
+from sklearn.naive_bayes import GaussianNB
+
+gnb = GaussianNB()
+gnb.fit(X_train, y_train)
+
+y_pred = gnb.predict(X_test)
+
+cm = confusion_matrix(y_test, pred)
+print('GNB')
+print(cm)
+
+print(('naive bayes R square'))
+print(r2_score(Y, gnb.predict(X)))
